@@ -3,8 +3,13 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
+import Quickshell.Io
 import qs.Commons
 import qs.Ui
+import "visualizers/siriwave.js" as VisSiri
+import "visualizers/sine.js" as VisSine
+import "visualizers/plasma.js" as VisPlasma
+import "visualizers/helpers.js" as H
 
 ColumnLayout {
     id: root
@@ -12,6 +17,58 @@ ColumnLayout {
     property bool collapsed: true
     property string searchText: ""
     property var visBands: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    property var visPeaks: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    property var visWave: []
+    property int visFrame: 0
+    property var _visState: ({})
+    property string _lastSpec: ""
+    property string visMode: "siriwave"
+    readonly property var visModes: ["siriwave", "sine", "plasma"]
+    property real beatDropPulse: 0
+    property real _bassAvg: 0
+    property double _lastDropTime: 0
+
+    function updateBeatDrop() {
+        if (!service || !service.isPlaying || !visBands || visBands.length < 3) {
+            beatDropPulse = 0
+            return
+        }
+        var subBass = (visBands[0] + visBands[1] + visBands[2]) / 3.0
+        var avg = _bassAvg * 0.85 + subBass * 0.15
+        _bassAvg = avg
+        var delta = subBass - avg
+        var now = Date.now()
+        if (subBass > 0.40 && delta > 0.15 && (now - _lastDropTime) > 260) {
+            beatDropPulse = 1.0
+            _lastDropTime = now
+        } else {
+            beatDropPulse = Math.max(0.0, beatDropPulse * 0.88 - 0.02)
+        }
+    }
+
+    function updateSpectrumData(raw) {
+        if (!raw) return
+        if (raw === _lastSpec) return
+        _lastSpec = raw
+        try {
+            var data = JSON.parse(raw)
+            var bands = data.bands || data
+            if (Array.isArray(bands) && bands.length >= 24) {
+                var newBands = [], newPeaks = []
+                for (var i = 0; i < 24; i++) {
+                    var target = Math.min(1.0, Math.max(0.0, Number(bands[i]) || 0.0))
+                    var prevPeak = visPeaks[i] || 0.0
+                    newBands.push(target)
+                    newPeaks.push(Math.max(target, prevPeak - 0.03))
+                }
+                visBands = newBands
+                visPeaks = newPeaks
+                visWave = Array.isArray(data.wave) ? data.wave : []
+                visFrame++
+                visCanvas.requestPaint()
+            }
+        } catch (e) {}
+    }
 
     readonly property string fontFam: Style.font.family
     readonly property color fg: Color.foreground
@@ -207,10 +264,9 @@ ColumnLayout {
         }
     }
 
-    // ── Visualizer (type omaramp bars, juste sous la barre de volume) ──
+    // ── Visualizer (siriwave / sine / plasma) — branché sur spectrum.json réel
     Rectangle {
         id: visBox
-        visible: service && service.isPlaying
         Layout.fillWidth: true
         implicitHeight: Style.space(52)
         radius: Style.space(4)
@@ -219,64 +275,120 @@ ColumnLayout {
         border.width: 1
         clip: true
 
+        // Mode label
+        Text {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: Style.space(4)
+            text: (root.visMode === "siriwave" ? "Siri Wave" : root.visMode === "sine" ? "Sine Wave" : "Liquid Plasma") + " ▾"
+            color: modeMouse.containsMouse ? cAccent : Qt.rgba(1,1,1,0.65)
+            font.family: fontFam
+            font.pixelSize: Style.font.caption * 0.85
+            font.bold: true
+            z: 5
+            MouseArea {
+                id: modeMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    var idx = root.visModes.indexOf(root.visMode)
+                    root.visMode = root.visModes[(idx + 1) % root.visModes.length]
+                    root._visState = ({})
+                    visCanvas.requestPaint()
+                }
+            }
+        }
+
         Canvas {
             id: visCanvas
             anchors.fill: parent
             anchors.margins: 2
+            anchors.topMargin: Style.space(12)
             onPaint: {
                 var ctx = getContext("2d")
                 var w = width, h = height
                 ctx.clearRect(0, 0, w, h)
-                var bands = root.visBands
-                var count = bands.length
-                var gap = 3
-                var barW = Math.max(2, Math.floor((w - (count - 1) * gap) / count))
-                var totalW = count * barW + (count - 1) * gap
-                var startX = Math.floor((w - totalW) / 2)
-                var accent = cAccent
-                for (var i = 0; i < count; i++) {
-                    var v = Math.max(0.06, Math.min(1.0, bands[i] || 0))
-                    var barH = Math.max(3, v * h * 0.92)
-                    var x = startX + i * (barW + gap)
-                    var y = (h - barH) / 2
-                    // gradient accent → slightly darker
-                    var grad = ctx.createLinearGradient(x, y, x, y + barH)
-                    grad.addColorStop(0, Qt.rgba(accent.r, accent.g, accent.b, 0.95))
-                    grad.addColorStop(1, Qt.rgba(accent.r * 0.6, accent.g * 0.6, accent.b * 0.6, 0.85))
-                    ctx.fillStyle = grad
-                    ctx.fillRect(x, y, barW, barH)
+                root.updateBeatDrop()
+                var d = {
+                    bands: root.visBands,
+                    wave: root.visWave,
+                    frame: root.visFrame,
+                    playing: service ? service.isPlaying : false,
+                    width: w,
+                    height: h,
+                    accent: cAccent,
+                    foreground: fg,
+                    dim: cMuted,
+                    beatDrop: root.beatDropPulse,
+                    progress: 0,
+                    state: root._visState
                 }
+                if (root.visMode === "siriwave") VisSiri.render(ctx, d)
+                else if (root.visMode === "sine") VisSine.render(ctx, d)
+                else if (root.visMode === "plasma") VisPlasma.render(ctx, d)
             }
         }
 
-        Timer {
-            id: visTimer
-            interval: 75
-            running: root.service && root.service.isPlaying
-            repeat: true
-            onTriggered: {
-                var next = []
-                for (var i = 0; i < 24; i++) {
-                    var prev = root.visBands[i] || 0
-                    // target random 0.15–0.95, smooth toward target
-                    var target = 0.15 + Math.random() * 0.80
-                    // bass bump every ~8 frames
-                    if (i < 4 && Math.random() < 0.18) target = 0.85 + Math.random() * 0.15
-                    var v = prev * 0.55 + target * 0.45
-                    // peak decay if not playing soon stoppedhandled by visible
-                    next.push(Math.max(0.06, Math.min(1.0, v)))
-                }
-                root.visBands = next
-                visCanvas.requestPaint()
-            }
-            onRunningChanged: if (!running) { root.visBands = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]; visCanvas.requestPaint() }
-        }
-
-        // click to toggle play/pause as shortcut
         MouseArea {
             anchors.fill: parent
+            anchors.topMargin: Style.space(12)
             cursorShape: Qt.PointingHandCursor
-            onClicked: if (service) service.toggle()
+            onClicked: {
+                var idx = root.visModes.indexOf(root.visMode)
+                root.visMode = root.visModes[(idx + 1) % root.visModes.length]
+                root._visState = ({})
+                visCanvas.requestPaint()
+            }
+        }
+    }
+
+    // Spectrum file watcher (real FFT)
+    FileView {
+        id: specFile
+        path: (Quickshell.env("XDG_RUNTIME_DIR") || ("/run/user/" + (Quickshell.env("UID") || "1000"))) + "/omarchy-ouifm/spectrum.json"
+        watchChanges: true
+        atomicWrites: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: root.updateSpectrumData(text())
+        onLoadFailed: {}
+    }
+
+    Timer {
+        id: specTimer
+        interval: 66
+        running: service ? service.isPlaying : false
+        repeat: true
+        onTriggered: {
+            if (service && service.isPlaying) {
+                specFile.reload()
+                // fallback: if no data yet, keep previous bands and just bump frame
+                root.visFrame++
+                visCanvas.requestPaint()
+            } else {
+                // decay when paused
+                var decayed = []
+                var hasAny = false
+                for (var k = 0; k < 24; k++) {
+                    var b = Math.max(0, (root.visBands[k] || 0) * 0.82 - 0.02)
+                    var p = Math.max(0, (root.visPeaks[k] || 0) * 0.82 - 0.02)
+                    decayed.push(b)
+                    if (b > 0) hasAny = true
+                }
+                root.visBands = decayed
+                root.visPeaks = decayed
+                if (hasAny) visCanvas.requestPaint()
+            }
+        }
+        onRunningChanged: {
+            if (!running) {
+                root.visBands = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                root.visPeaks = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                visCanvas.requestPaint()
+            } else {
+                specFile.reload()
+            }
         }
     }
 

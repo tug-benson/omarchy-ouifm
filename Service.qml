@@ -176,6 +176,7 @@ Item {
             mpvProc.running = false
         }
         killStaleProc.running = true
+        stopSpectrum()
         root.isPlaying = false
         root.isLoading = false
         root.nowPlaying = ""
@@ -246,8 +247,8 @@ Item {
             mpvProc.running = true
             root.isPlaying = true
             root.isLoading = false
-            // Start metadata polling shortly after
-            Qt.callLater(function() { metaTimer.restart() })
+            // Start metadata + spectrum
+            Qt.callLater(function() { metaTimer.restart(); startSpectrum() })
         }
     }
 
@@ -351,6 +352,32 @@ Item {
 
     Process {
         id: spotifyProc
+        stdout: StdioCollector { waitForEnd: true }
+    }
+
+    // ── Spectrum daemon (real FFT via parec/pw-record) ──
+    property bool spectrumRunning: false
+    Process {
+        id: spectrumProc
+        stdout: StdioCollector { waitForEnd: true }
+        stderr: StdioCollector { waitForEnd: true }
+    }
+    function startSpectrum() {
+        if (spectrumProc.running) return
+        var script = Qt.resolvedUrl("spectrum.py").toString().replace(/^file:\/\//, "")
+        spectrumProc.command = ["python3", script]
+        spectrumProc.running = true
+        spectrumRunning = true
+    }
+    function stopSpectrum() {
+        if (spectrumProc.running) spectrumProc.running = false
+        spectrumRunning = false
+        // kill any orphan python spectrum.py
+        killSpectrumProc.running = true
+    }
+    Process {
+        id: killSpectrumProc
+        command: ["bash", "-lc", "pkill -f 'omarchy-ouifm.*spectrum.py' 2>/dev/null; rm -f /run/user/$(id -u)/omarchy-ouifm/spectrum.json 2>/dev/null; true"]
         stdout: StdioCollector { waitForEnd: true }
     }
 
