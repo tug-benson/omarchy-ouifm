@@ -26,7 +26,7 @@ Item {
         ? (shell.serviceFor("io.github.tug-benson.omarchy-ouifm") || shell.serviceFor("omarchy-ouifm"))
         : null
 
-    property bool collapsed: false
+    property bool collapsed: true
 
     function open(payloadJson) {
         try { var p = JSON.parse(payloadJson || "{}"); } catch (e) {}

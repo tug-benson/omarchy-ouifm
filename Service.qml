@@ -50,6 +50,7 @@ Item {
     property int volume: 80
     property string nowPlaying: ""   // ICY StreamTitle
     property string nowPlayingRaw: ""
+    property var favorites: []   // array of station ids
 
     readonly property string ipcSocket: "/tmp/omarchy-ouifm-mpv.sock"
     readonly property var currentStation: {
@@ -62,6 +63,25 @@ Item {
         for (var i = 0; i < stations.length; i++)
             if (stations[i].id === id) return stations[i]
         return null
+    }
+
+    function isFavorite(id) {
+        return favorites.indexOf(id) !== -1
+    }
+    function toggleFavorite(id) {
+        var idx = favorites.indexOf(id)
+        var next = favorites.slice()
+        if (idx === -1) next.push(id)
+        else next.splice(idx, 1)
+        favorites = next
+    }
+    function favoriteStations() {
+        var out = []
+        for (var i = 0; i < favorites.length; i++) {
+            var s = stationById(favorites[i])
+            if (s) out.push(s)
+        }
+        return out
     }
 
     function scriptPath(name) {
@@ -103,6 +123,13 @@ Item {
                         root.currentAltCover = s.altCover
                     }
                 }
+                if (o.favorites && Array.isArray(o.favorites)) {
+                    // Sanitize: keep only known ids
+                    var clean = []
+                    for (var i = 0; i < o.favorites.length; i++)
+                        if (root.stationById(o.favorites[i])) clean.push(o.favorites[i])
+                    root.favorites = clean
+                }
             } catch (e) {}
         }
     }
@@ -112,7 +139,7 @@ Item {
         stdout: StdioCollector { waitForEnd: true }
     }
     function persistState() {
-        var payload = JSON.stringify({ volume: root.volume, currentId: root.currentId })
+        var payload = JSON.stringify({ volume: root.volume, currentId: root.currentId, favorites: root.favorites })
         // Escape single quotes for bash
         var esc = payload.replace(/'/g, "'\\''")
         saveProc.command = ["bash", "-lc", "mkdir -p \"$HOME/.config/omarchy-ouifm\" && printf '%s' '" + esc + "' > \"$HOME/.config/omarchy-ouifm/state.json\""]
@@ -120,6 +147,7 @@ Item {
     }
     onVolumeChanged: persistState()
     onCurrentIdChanged: persistState()
+    onFavoritesChanged: persistState()
 
     // ── mpv playback ──
     Process {
@@ -288,6 +316,7 @@ Item {
         function stop(): string { root.stop(); return "ok" }
         function toggle(): string { root.toggle(); return "ok" }
         function setVolume(v: string): string { root.setVolume(parseInt(v, 10)); return "ok" }
+        function toggleFavorite(id: string): string { root.toggleFavorite(id); return "ok" }
         function ping(): string { return "ok" }
     }
 }

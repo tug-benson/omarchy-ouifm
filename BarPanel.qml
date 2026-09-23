@@ -24,7 +24,7 @@ Panel {
             : null)
 
     // Keep collapsed state per-panel instance (could persist via settings later)
-    property bool collapsed: false
+    property bool collapsed: true
 
     function open() { controller.show() }
     function close() { controller.hide() }
