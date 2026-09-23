@@ -387,9 +387,13 @@ Item {
                     if (score > bestScore) { bestScore = score; best = fav }
                 }
                 if (best && bestScore >= 50 && typeof svc.playFavorite === "function") {
-                    // Use OmaSonos favorite playback (TuneIn)
+                    console.log("ouifm: Sonos via OmaSonos favorite", best.title, best.id, "score", bestScore)
                     svc.playFavorite(best.id, best.title)
                     return
+                } else if (best) {
+                    console.log("ouifm: Sonos favorite bestScore too low", best.title, bestScore, "cur", curNorm)
+                } else {
+                    console.log("ouifm: Sonos no favorite match for", curNorm, "items", items.length)
                 }
                 // No good match: if OmaSonos is ready but no favorite, still fallback to direct
                 // Also trigger refresh if favorites not loaded
@@ -400,10 +404,24 @@ Item {
         } catch (e) {
             console.warn("OmaSonos favorite lookup failed", e)
         }
-        // 2. Fallback: direct play_uri via soco (works if Sonos reachable on same network)
+        // 2. Fallback: direct play_uri via soco (with hint IP from OmaSonos)
         var title = currentLabel || "OUI FM"
+        var hintIp = ""
+        try {
+            var svc2 = sonosService
+            if (svc2 && svc2.snapshot) {
+                if (svc2.snapshot.target && svc2.snapshot.target.ip) hintIp = String(svc2.snapshot.target.ip)
+                else if (svc2.snapshot.households && svc2.snapshot.households.length > 0) {
+                    var hh = svc2.snapshot.households[0]
+                    if (hh.rooms && hh.rooms.length > 0) hintIp = String(hh.rooms[0].ip || "")
+                }
+            }
+        } catch (e) {}
         var script = Qt.resolvedUrl("bin/omarchy-ouifm-sonos").toString().replace(/^file:\/\//, "")
-        sonosProc.command = [script, currentStream, title]
+        var args = [script, currentStream, title]
+        if (hintIp) args.push(hintIp)
+        console.log("ouifm: Sonos fallback direct play_uri", currentStream, "hintIp", hintIp)
+        sonosProc.command = args
         sonosProc.running = true
     }
     Process {

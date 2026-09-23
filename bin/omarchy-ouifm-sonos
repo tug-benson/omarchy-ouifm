@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Send OUI FM stream to Sonos via SoCo (discovery). Tries omasonos venv first."""
-import sys, os, subprocess, json, time, urllib.parse
+"""Send OUI FM stream to Sonos via SoCo. Tries omasonos venv first, falls back to scan_network and hint IP."""
+import sys, os, subprocess, time
 
 def find_python():
     candidates = [
@@ -9,7 +9,6 @@ def find_python():
     ]
     for p in candidates:
         if os.path.exists(p):
-            # test soco import
             try:
                 out = subprocess.run([p, "-c", "import soco"], capture_output=True, timeout=3)
                 if out.returncode == 0:
@@ -19,55 +18,71 @@ def find_python():
 
 def main():
     if len(sys.argv) < 2:
-        print("usage: omarchy-ouifm-sonos <stream_url> [title]", file=sys.stderr)
+        print("usage: omarchy-ouifm-sonos <stream_url> [title] [sonos_ip]", file=sys.stderr)
         sys.exit(1)
     uri = sys.argv[1]
     title = sys.argv[2] if len(sys.argv) > 2 else "OUI FM"
-    # Try to find soco via omasonos venv or system
+    hint_ip = sys.argv[3] if len(sys.argv) > 3 else ""
     py = find_python()
-    # Re-exec with correct python if needed
     if py != sys.executable:
         os.execv(py, [py] + sys.argv)
-    # Now we have soco
     try:
         import soco
+        from soco.discovery import scan_network
     except Exception as e:
-        print(f"soco not available: {e}", file=sys.stderr)
-        sys.exit(1)
-    # Discover with timeout
+        try:
+            import soco
+            scan_network = None
+        except Exception as e2:
+            print(f"soco not available: {e2}", file=sys.stderr)
+            sys.exit(1)
+        if scan_network is None:
+            scan_network = None
+    zones = None
+    # 1. SSDP discover
     try:
         zones = soco.discover(timeout=5)
     except Exception as e:
         print(f"discover failed: {e}", file=sys.stderr)
-        sys.exit(1)
+        zones = None
+    # 2. Network scan fallback (like OmaSonos)
+    if not zones and scan_network:
+        try:
+            print("SSDP found nothing, trying scan_network...", file=sys.stderr)
+            zones = scan_network()
+        except Exception as e:
+            print(f"scan_network failed: {e}", file=sys.stderr)
+            zones = None
+    # 3. Direct hint IP fallback (from OmaSonos snapshot)
+    if not zones and hint_ip:
+        try:
+            print(f"Trying hint IP {hint_ip}", file=sys.stderr)
+            z = soco.SoCo(hint_ip)
+            z.player_name
+            zones = {z}
+        except Exception as e:
+            print(f"hint IP failed: {e}", file=sys.stderr)
+            zones = None
     if not zones:
-        print("No Sonos found on network", file=sys.stderr)
+        print("No Sonos found on network (discover + scan + hint failed)", file=sys.stderr)
         sys.exit(1)
-    # Pick coordinator of first household or first zone
-    # Prefer zone that is coordinator
     zone = None
     for z in zones:
         try:
             if z.is_coordinator:
                 zone = z
                 break
-        except:
-            pass
+        except: pass
     if zone is None:
         zone = list(zones)[0]
-    # Try to get target from OmaSonos snapshot if available (selected room)
-    # For now use discovered zone
-    print(f"Sending {uri} to Sonos {zone.player_name} ({zone.ip_address})", file=sys.stderr)
+    print(f"Sending {uri} to Sonos {zone.player_name} ({zone.ip_address}) title={title}", file=sys.stderr)
     try:
-        # Use play_uri with metadata
-        # SoCo's play_uri handles radio: uri, title, meta
         zone.play_uri(uri, title=title)
-        # Ensure playing
         time.sleep(0.5)
-        # zone.play() # play_uri already plays
         print("ok")
     except Exception as e:
         print(f"play_uri failed: {e}", file=sys.stderr)
+        import traceback; traceback.print_exc()
         sys.exit(1)
 
 if __name__ == "__main__":
