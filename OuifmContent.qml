@@ -105,6 +105,7 @@ ColumnLayout {
                 asynchronous: true
                 cache: true
                 smooth: true
+                mipmap: true
             }
             Image { visible: false; source: service ? (service.currentAltCover || "") : "" }
         }
@@ -285,6 +286,8 @@ ColumnLayout {
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
                                 cache: true
+                                smooth: true
+                                mipmap: true
                             }
                         }
                         Label {
@@ -447,6 +450,8 @@ ColumnLayout {
                                     fillMode: Image.PreserveAspectCrop
                                     asynchronous: true
                                     cache: true
+                                    smooth: true
+                                    mipmap: true
                                 }
                             }
                             ColumnLayout {
