@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
+import QtQuick.Effects
 import "visualizers/siriwave.js" as VisSiri
 import "visualizers/sine.js" as VisSine
 import "visualizers/plasma.js" as VisPlasma
@@ -100,38 +101,137 @@ ColumnLayout {
 
     spacing: Style.space(8)
 
-    // ── Title ──
-    RowLayout {
+    // ── Hero header (test local, différenciant) ──
+    Rectangle {
         Layout.fillWidth: true
-        spacing: Style.space(6)
-        Label {
-            textFormat: Text.PlainText
-            text: "󰓃"
-            font.family: "JetBrainsMono Nerd Font"
-            font.pixelSize: Style.font.title + 4
+        implicitHeight: Style.space(68)
+        radius: Style.space(8)
+        clip: true
+        color: Color.background
+        border.color: Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.22)
+        border.width: 1
+
+        // Blurred altCover background
+        Image {
+            id: heroBg
+            anchors.fill: parent
+            source: service ? (service.currentAltCover || service.currentImage || "") : ""
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+            cache: true
+            opacity: 0.38
+            layer.enabled: true
+            layer.effect: MultiEffect {
+                blurEnabled: true
+                blur: 0.85
+                blurMax: 32
+                autoPaddingEnabled: true
+            }
+        }
+        Rectangle {
+            anchors.fill: parent
+            color: Util.alpha(Color.background, 0.58)
+        }
+        // Accent bottom line
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 2
             color: cAccent
+            opacity: 0.85
         }
-        Label {
-            textFormat: Text.PlainText
-            text: "OÜI FM"
-            font.family: fontFam
-            font.pixelSize: Style.font.title + 1
-            font.bold: true
-            color: cMuted
-            Layout.fillWidth: true
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: Style.space(12)
+            anchors.rightMargin: Style.space(52)
+            anchors.topMargin: Style.space(8)
+            anchors.bottomMargin: Style.space(8)
+            spacing: Style.space(10)
+
+            // Glyph in circle
+            Rectangle {
+                Layout.preferredWidth: Style.space(36)
+                Layout.preferredHeight: Style.space(36)
+                radius: Style.space(18)
+                color: Util.alpha(cAccent, 0.18)
+                border.color: Util.alpha(cAccent, 0.45)
+                border.width: 1
+                Label {
+                    anchors.centerIn: parent
+                    textFormat: Text.PlainText
+                    text: ""
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 20
+                    color: cAccent
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+                Label {
+                    textFormat: Text.PlainText
+                    text: "OÜI FM"
+                    font.family: fontFam
+                    font.pixelSize: Style.font.title + 2
+                    font.bold: true
+                    color: fg
+                    elide: Text.ElideRight
+                }
+                Label {
+                    textFormat: Text.PlainText
+                    text: "La Radio du Rock  •  21 webradios"
+                    font.family: fontFam
+                    font.pixelSize: Style.font.caption
+                    font.bold: true
+                    color: Util.alpha(fg, 0.92)
+                    elide: Text.ElideRight
+                }
+            }
         }
-        Label {
-            textFormat: Text.PlainText
+
+        // LIVE pill — top-right corner, inset
+        Rectangle {
             visible: service && service.isPlaying
-            text: "● LIVE"
-            font.family: fontFam
-            font.pixelSize: Style.font.caption
-            font.bold: true
-            color: Color.urgent
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.topMargin: Style.space(6)
+            anchors.rightMargin: Style.space(8)
+            implicitWidth: liveRow.implicitWidth + Style.space(12)
+            implicitHeight: Style.space(20)
+            radius: Style.space(10)
+            color: Util.alpha(Color.urgent, 0.18)
+            border.color: Util.alpha(Color.urgent, 0.55)
+            border.width: 1
+            RowLayout {
+                id: liveRow
+                anchors.centerIn: parent
+                spacing: Style.space(4)
+                Rectangle {
+                    Layout.preferredWidth: 6
+                    Layout.preferredHeight: 6
+                    radius: 3
+                    color: Color.urgent
+                    SequentialAnimation on opacity {
+                        loops: Animation.Infinite
+                        running: service && service.isPlaying
+                        NumberAnimation { from: 1.0; to: 0.35; duration: 700; easing.type: Easing.InOutQuad }
+                        NumberAnimation { from: 0.35; to: 1.0; duration: 700; easing.type: Easing.InOutQuad }
+                    }
+                }
+                Label {
+                    textFormat: Text.PlainText
+                    text: "LIVE"
+                    font.family: fontFam
+                    font.pixelSize: Style.font.caption - 1
+                    font.bold: true
+                    color: Color.urgent
+                }
+            }
         }
     }
-
-    Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Qt.rgba(1,1,1,0.08) }
 
     // ── Now playing card ──
     RowLayout {
