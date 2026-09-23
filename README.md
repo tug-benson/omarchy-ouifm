@@ -15,7 +15,7 @@ An [Omarchy](https://omarchy.org) plugin to listen to **OUI FM** and its 20 webr
 - **Collapsible list** — collapsed by default, expands to a scrollable viewport showing 3.5 rows (remaining stations scroll). Current station highlighted with accent border.
 - **Volume + persistence** — slider controls mpv volume via IPC (`socat`), falls back to `--volume` on next play. Volume, last station and favorites are persisted to `~/.config/omarchy-ouifm/state.json`.
 - **Spotify** — one-click search for the current track on Spotify (no auth, opens `open.spotify.com/search/` in the browser).
-- **Sonos** — one-click send of the current stream to your Sonos speaker via SoCo (uses the `omasonos` venv if available, otherwise system `python3` + `soco`). No extra configuration if OmaSonos is already set up.
+- **Sonos** — one-click send to Sonos. If `omasonos` is installed and the station exists as a Sonos favorite (TuneIn), it plays that favorite via `OmaSonos` (`playFavorite`). Otherwise it falls back to direct `play_uri` via `soco` discovery (no extra config if OmaSonos is set up).
 
 ## Installation
 
@@ -70,7 +70,7 @@ All streams are public MP3 128k at `*.ice.infomaniak.ch`; cover art comes from `
 - `Panel.qml` — floating `PanelWindow` for `kind: panel`.
 - `OuifmContent.qml` — shared UI: title, now playing, volume, visualizer (Canvas + FileView on `.../omarchy-ouifm/spectrum.json`), favorites, search, collapsible list.
 - `spectrum.py` + `visualizers/` — FFT capture and three JS renderers (siriwave, sine, plasma) reused from Omaramp but scoped to `omarchy-ouifm`.
-- `bin/omarchy-ouifm-sonos` — Python helper that discovers Sonos via `soco.discover()` and calls `play_uri`.
+- `bin/omarchy-ouifm-sonos` — fallback helper that discovers Sonos via `soco.discover()` and calls `play_uri` (used when no OmaSonos favorite matches).
 
 No secrets are stored. No privileged operations.
 

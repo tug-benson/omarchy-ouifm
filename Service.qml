@@ -56,6 +56,7 @@ Item {
     property string trackTimestamp: ""
     property string currentMdsId: ""
     property var favorites: []   // array of station ids
+    readonly property var sonosService: shell && shell.serviceFor ? shell.serviceFor("io.github.ctl0v0.omasonos") : null
 
     readonly property string ipcSocket: "/tmp/omarchy-ouifm-mpv.sock"
     readonly property var currentStation: {
@@ -355,8 +356,51 @@ Item {
         stdout: StdioCollector { waitForEnd: true }
     }
 
+    function normalizeForSonos(s) {
+        var t = String(s || "").toLowerCase()
+        // strip accents for ouï -> oui
+        t = t.replace(/ï/g, "i").replace(/ù/g, "u").replace(/é/g, "e").replace(/è/g, "e")
+        return t.trim()
+    }
     function sendToSonos() {
-        if (!currentStream) return
+        if (!currentStream && !currentLabel) return
+        // 1. Try OmaSonos favorites (TuneIn) — user has OUI FM webradios as Sonos favorites
+        try {
+            var svc = sonosService
+            if (svc && svc.snapshot && svc.snapshot.favorites && svc.snapshot.favorites.items) {
+                var items = svc.snapshot.favorites.items
+                var curNorm = normalizeForSonos(currentLabel)
+                var curSuffix = curNorm.replace(/^oui fm\s*/,"").trim()
+                var best = null
+                var bestScore = -1
+                for (var i = 0; i < items.length; i++) {
+                    var fav = items[i]
+                    var title = String(fav.title || "")
+                    var tNorm = normalizeForSonos(title)
+                    var score = -1
+                    if (tNorm === curNorm) score = 100
+                    else if (curNorm && tNorm.indexOf(curNorm) !== -1) score = 80
+                    else if (curNorm && curNorm.indexOf(tNorm) !== -1) score = 80
+                    else if (curSuffix && tNorm.indexOf(curSuffix) !== -1) score = 60
+                    else if (curSuffix && curSuffix.indexOf(tNorm) !== -1) score = 50
+                    // also try matching without "oui fm" prefix for webradios like "Classic Rock"
+                    if (score > bestScore) { bestScore = score; best = fav }
+                }
+                if (best && bestScore >= 50 && typeof svc.playFavorite === "function") {
+                    // Use OmaSonos favorite playback (TuneIn)
+                    svc.playFavorite(best.id, best.title)
+                    return
+                }
+                // No good match: if OmaSonos is ready but no favorite, still fallback to direct
+                // Also trigger refresh if favorites not loaded
+                if (svc.snapshot.favorites.state === "not_loaded" && typeof svc.refreshFavorites === "function") {
+                    svc.refreshFavorites()
+                }
+            }
+        } catch (e) {
+            console.warn("OmaSonos favorite lookup failed", e)
+        }
+        // 2. Fallback: direct play_uri via soco (works if Sonos reachable on same network)
         var title = currentLabel || "OUI FM"
         var script = Qt.resolvedUrl("bin/omarchy-ouifm-sonos").toString().replace(/^file:\/\//, "")
         sonosProc.command = [script, currentStream, title]
