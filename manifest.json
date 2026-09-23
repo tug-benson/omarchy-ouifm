@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.tug-benson.omarchy-ouifm",
+  "name": "OUI FM",
+  "version": "1.0.0",
+  "description": "OUI FM webradios for Omarchy — play the main station and 20 webradios (Classic Rock, Alternatif, Blues'n'Rock, etc.) directly from the bar or a floating panel. mpv-powered with cover art and collapsible station list.",
+  "author": "tug-benson",
+  "license": "MIT",
+  "repository": "https://github.com/tug-benson/omarchy-ouifm",
+  "kinds": ["service", "bar-widget", "panel"],
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "OUI FM",
+    "description": "OUI FM webradio player — now playing and station picker",
+    "category": "Media",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "volume": 80,
+      "lastStationId": "QnaHBfM52n",
+      "showTitleInBar": true
+    },
+    "schema": [
+      {
+        "key": "volume",
+        "type": "integer",
+        "label": "Default volume (%)",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "defaultValue": 80
+      },
+      {
+        "key": "lastStationId",
+        "type": "string",
+        "label": "Last station ID",
+        "defaultValue": "QnaHBfM52n"
+      },
+      {
+        "key": "showTitleInBar",
+        "type": "boolean",
+        "label": "Show station name in bar",
+        "defaultValue": true
+      }
+    ]
+  },
+  "panel": {
+    "displayName": "OUI FM",
+    "description": "Floating OUI FM player panel",
+    "category": "Media"
+  }
+}

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+/state.json
+omarchy-ouifm-plugin.md
+.state/
+
