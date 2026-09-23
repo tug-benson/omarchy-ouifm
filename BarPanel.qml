@@ -46,7 +46,7 @@ Panel {
         open: root.opened
         focusTarget: keyCatcher
         contentWidth: Style.space(360)
-        contentHeight: flick.contentHeight + Style.space(24)
+        contentHeight: flick.contentHeight + Style.space(36)
 
         PanelKeyCatcher {
             id: keyCatcher

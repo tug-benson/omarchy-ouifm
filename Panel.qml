@@ -72,7 +72,7 @@ Item {
         BorderSurface {
             id: card
             width: Math.min(parent.width - Style.space(32), Style.space(380))
-            height: Math.min(parent.height - Style.space(32), flick.contentHeight + Style.space(32))
+            height: Math.min(parent.height - Style.space(32), flick.contentHeight + Style.space(40))
             anchors.centerIn: parent
             color: Color.background
             borderSpec: Border.surfaceSpec("popups", "border", Color.popups.border, Math.max(1, Style.space(2)))
