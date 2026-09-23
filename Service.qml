@@ -336,6 +336,24 @@ Item {
         }
     }
 
+    function searchSpotify() {
+        var q = ""
+        if (trackArtist && trackTitle) q = trackArtist + " - " + trackTitle
+        else if (trackTitle) q = trackTitle
+        else if (nowPlaying) q = nowPlaying
+        else if (currentLabel) q = currentLabel
+        else return
+        // Encode for URL, open in browser without auth
+        var url = "https://open.spotify.com/search/" + encodeURIComponent(q)
+        spotifyProc.command = ["bash", "-lc", "xdg-open \"" + url.replace(/\"/g, "\\\"") + "\" 2>/dev/null || gio open \"" + url.replace(/\"/g, "\\\"") + "\" 2>/dev/null || true"]
+        spotifyProc.running = true
+    }
+
+    Process {
+        id: spotifyProc
+        stdout: StdioCollector { waitForEnd: true }
+    }
+
     // ── External control via IPC ──
     IpcHandler {
         target: "io.github.tug-benson.omarchy-ouifm"
@@ -344,6 +362,7 @@ Item {
         function toggle(): string { root.toggle(); return "ok" }
         function setVolume(v: string): string { root.setVolume(parseInt(v, 10)); return "ok" }
         function toggleFavorite(id: string): string { root.toggleFavorite(id); return "ok" }
+        function searchSpotify(): string { root.searchSpotify(); return "ok" }
         function ping(): string { return "ok" }
     }
 }

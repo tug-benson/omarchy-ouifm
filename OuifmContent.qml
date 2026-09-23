@@ -170,6 +170,16 @@ ColumnLayout {
                     Layout.preferredWidth: Style.space(28)
                     onClicked: if (service) service.stop()
                 }
+                // Spotify search (sans auth) — glyph 
+                Button {
+                    visible: service && (service.trackTitle !== "" || service.nowPlaying !== "")
+                    iconText: ""
+                    fontFamily: "JetBrainsMono Nerd Font"
+                    fontSize: Style.font.body
+                    tooltipText: "Chercher sur Spotify"
+                    Layout.preferredWidth: Style.space(28)
+                    onClicked: if (service) service.searchSpotify()
+                }
                 Item { Layout.fillWidth: true }
             }
         }
