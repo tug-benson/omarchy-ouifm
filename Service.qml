@@ -355,6 +355,22 @@ Item {
         stdout: StdioCollector { waitForEnd: true }
     }
 
+    function sendToSonos() {
+        if (!currentStream) return
+        var title = currentLabel || "OUI FM"
+        var script = Qt.resolvedUrl("bin/omarchy-ouifm-sonos").toString().replace(/^file:\/\//, "")
+        sonosProc.command = [script, currentStream, title]
+        sonosProc.running = true
+    }
+    Process {
+        id: sonosProc
+        stdout: StdioCollector { waitForEnd: true }
+        stderr: StdioCollector { waitForEnd: true }
+        onExited: function(code) {
+            if (code !== 0) console.warn("Sonos send failed, code", code, stdout.text, stderr.text)
+        }
+    }
+
     // ── Spectrum daemon (real FFT via parec/pw-record) ──
     property bool spectrumRunning: false
     Process {
@@ -390,6 +406,7 @@ Item {
         function setVolume(v: string): string { root.setVolume(parseInt(v, 10)); return "ok" }
         function toggleFavorite(id: string): string { root.toggleFavorite(id); return "ok" }
         function searchSpotify(): string { root.searchSpotify(); return "ok" }
+        function sendToSonos(): string { root.sendToSonos(); return "ok" }
         function ping(): string { return "ok" }
     }
 }

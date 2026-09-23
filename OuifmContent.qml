@@ -202,7 +202,7 @@ ColumnLayout {
                 textFormat: Text.PlainText
                 Layout.fillWidth: true
                 visible: !service || (service.trackArtist === "" && service.trackTitle === "" && service.nowPlaying === "")
-                text: service && service.isPlaying ? "En direct — Rock'n'roll" : (service && service.lastError ? service.lastError : "Sélectionne une station")
+                text: service && service.isPlaying ? "Live — Rock'n'roll" : (service && service.lastError ? service.lastError : "Select a station")
                 font.family: fontFam
                 font.pixelSize: Style.font.bodySmall
                 color: service && service.lastError ? Color.urgent : cMuted
@@ -219,15 +219,25 @@ ColumnLayout {
                         else service.play(service.currentId)
                     }
                 }
-                // Spotify search (sans auth) — glyph 
+                // Spotify search (sans auth) — glyph
                 Button {
                     visible: service && (service.trackTitle !== "" || service.nowPlaying !== "")
                     iconText: ""
                     fontFamily: "JetBrainsMono Nerd Font"
                     fontSize: Style.font.body
-                    tooltipText: "Chercher sur Spotify"
+                    tooltipText: "Search on Spotify"
                     Layout.preferredWidth: Style.space(28)
                     onClicked: if (service) service.searchSpotify()
+                }
+                // Send to Sonos — uses soco via omasonos venv if available
+                Button {
+                    visible: service && service.currentStream !== ""
+                    iconText: "󰋊"
+                    fontFamily: "JetBrainsMono Nerd Font"
+                    fontSize: Style.font.body
+                    tooltipText: "Send to Sonos"
+                    Layout.preferredWidth: Style.space(28)
+                    onClicked: if (service) service.sendToSonos()
                 }
                 Item { Layout.fillWidth: true }
             }
@@ -403,7 +413,7 @@ ColumnLayout {
             spacing: Style.space(6)
             Label {
                 textFormat: Text.PlainText
-                text: "★ Favoris"
+                text: "Favorites"
                 font.family: fontFam
                 font.pixelSize: Style.font.bodySmall
                 font.bold: true
@@ -421,7 +431,7 @@ ColumnLayout {
             Label {
                 textFormat: Text.PlainText
                 visible: favStations.length > 0
-                text: "★ = en premier"
+                text: "Starred first"
                 font.family: fontFam
                 font.pixelSize: Style.font.caption - 1
                 color: cMuted
@@ -433,7 +443,7 @@ ColumnLayout {
             textFormat: Text.PlainText
             visible: favStations.length === 0
             Layout.fillWidth: true
-            text: "Aucun favori — clique ★ sur une station pour l’épingler"
+            text: "No favorites — click star on a station to pin it"
             font.family: fontFam
             font.pixelSize: Style.font.caption
             color: cMuted
@@ -496,12 +506,11 @@ ColumnLayout {
                             font.pixelSize: Style.font.caption
                             color: Color.accent
                         }
-                        // Remove favorite
                         Button {
                             iconText: ""
                             fontFamily: "JetBrainsMono Nerd Font"
                             fontSize: Style.font.caption
-                            tooltipText: "Retirer des favoris"
+                            tooltipText: "Remove from favorites"
                             Layout.preferredWidth: Style.space(24)
                             Layout.preferredHeight: Style.space(24)
                             onClicked: if (service) service.toggleFavorite(favRow.modelData.id)
@@ -532,10 +541,9 @@ ColumnLayout {
             Layout.fillWidth: true
             font.family: fontFam
             font.pixelSize: Style.font.bodySmall
-            placeholderText: "Rechercher une station…"
+            placeholderText: "Search station..."
             text: root.searchText
             onTextChanged: root.searchText = text
-            // Nerd Font search icon via placeholder not possible, use left icon overlay
             leftPadding: Style.space(24)
         }
         // Search icon overlay
@@ -546,7 +554,6 @@ ColumnLayout {
             font.pixelSize: Style.font.bodySmall
             color: cMuted
             opacity: 0.7
-            // Position over TextField left padding
             Layout.preferredWidth: 0
             x: searchField.x + Style.space(8)
             y: searchField.y + (searchField.height - implicitHeight) / 2
@@ -557,7 +564,7 @@ ColumnLayout {
             iconText: ""
             fontFamily: "JetBrainsMono Nerd Font"
             fontSize: Style.font.caption
-            tooltipText: "Effacer"
+            tooltipText: "Clear"
             Layout.preferredWidth: Style.space(28)
             onClicked: root.searchText = ""
         }
@@ -566,7 +573,7 @@ ColumnLayout {
     // ── Collapse toggle ──
     Button {
         Layout.fillWidth: true
-        text: root.collapsed ? "󰶄 Afficher les stations (" + filteredStations.length + (root.searchText !== "" ? " filtrées" : "") + ")" : "󰶂 Masquer les stations"
+        text: root.collapsed ? "Show stations (" + filteredStations.length + (root.searchText !== "" ? " filtered" : "") + ")" : "Hide stations"
         fontSize: Style.font.bodySmall
         onClicked: root.collapsed = !root.collapsed
     }
@@ -579,7 +586,7 @@ ColumnLayout {
 
         Label {
             textFormat: Text.PlainText
-            text: filteredStations.length === 0 ? "Aucune station trouvée" : filteredStations.length + " station(s)" + (root.searchText !== "" ? " — filtre: “" + root.searchText + "”" : "")
+            text: filteredStations.length === 0 ? "No station found" : filteredStations.length + " station(s)" + (root.searchText !== "" ? " — filter: \"" + root.searchText + "\"" : "")
             font.family: fontFam
             font.pixelSize: Style.font.caption
             color: cMuted
@@ -662,7 +669,7 @@ ColumnLayout {
                                 Label {
                                     textFormat: Text.PlainText
                                     Layout.fillWidth: true
-                                    text: service && service.currentId === row.modelData.id && service.isPlaying ? "▶ En lecture" : "MP3 128k • Infomaniak"
+                                    text: service && service.currentId === row.modelData.id && service.isPlaying ? "Playing" : "MP3 128k \u2022 Infomaniak"
                                     font.family: fontFam
                                     font.pixelSize: Style.font.caption - 1
                                     color: cMuted
@@ -682,7 +689,7 @@ ColumnLayout {
                                 iconText: service && service.isFavorite(row.modelData.id) ? "" : ""
                                 fontFamily: "JetBrainsMono Nerd Font"
                                 fontSize: Style.font.caption
-                                tooltipText: service && service.isFavorite(row.modelData.id) ? "Retirer des favoris" : "Ajouter aux favoris"
+                                tooltipText: service && service.isFavorite(row.modelData.id) ? "Remove from favorites" : "Add to favorites"
                                 Layout.preferredWidth: Style.space(24)
                                 Layout.preferredHeight: Style.space(24)
                                 onClicked: if (service) service.toggleFavorite(row.modelData.id)

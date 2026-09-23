@@ -1,17 +1,21 @@
 # OUI FM for Omarchy
 
-An [Omarchy](https://omarchy.org) plugin to listen to **OÜI FM** and its 20 webradios directly from the desktop.
+An [Omarchy](https://omarchy.org) plugin to listen to **OUI FM** and its 20 webradios directly from the desktop. OUI FM is a French rock radio — the plugin streams the national feed and all thematic webradios with live track info, cover art and audio visualization.
 
 ![OUI FM panel](preview.png)
 
 ## Features
 
-- **21 stations** — OÜI FM (national) + 20 webradios: Classic Rock, Rock Indé, Alternatif, Top of the Week, Garage Rock, Girls Rock, Rock Français, Blues'n'Rock, Bring The Noise, Acoustic, Génération Woodstock, Les Slows du Rock, Reggae, Rock 60's / 70's / 80's / 90's / 2000, Summertime, Rock'n'Food. See [ouifm.fr](https://www.ouifm.fr/).
-- **Bar widget + floating panel** — `bar-widget` shows a radio icon (● LIVE when playing); click to open a panel with the current station. `panel` can also be summoned as a floating window.
-- **Now playing card** — title at the top, cover/vignette on the left and live info on the right (station name + StreamTitle when available).
-- **Collapsible vertical list** — tap *Afficher les stations* to reveal all webradios in a vertical list with their vignettes. The current station is highlighted with an accent border.
-- **mpv playback** — streams are played via `mpv` (`--no-video --input-ipc-server`) against stable `ice.infomaniak.ch` MP3 128k endpoints (no expiring tokens, no scraping at runtime).
-- **Volume + persistence** — volume slider (IPC via `socat`, fallback to mpv `--volume` on next play) and last station are persisted to `~/.config/omarchy-ouifm/state.json`.
+- **21 stations** — OUI FM (national) + 20 webradios: Classic Rock, Rock Inde, Alternatif, Top of the Week, Garage Rock, Girls Rock, Rock Francais, Blues'n'Rock, Bring The Noise, Acoustic, Generation Woodstock, Les Slows du Rock, Reggae, Rock 60s / 70s / 80s / 90s / 2000, Summertime, Rock'n'Food. See [ouifm.fr](https://www.ouifm.fr/).
+- **Bar widget + floating panel** — bar icon shows live state, click to open the panel. The panel can also be summoned as a floating window via IPC.
+- **Now playing** — station vignette on the left, live track on the right (artist — title + cover from `TitleDiffusions` API), Play/Stop, Spotify search and Send to Sonos actions.
+- **Audio visualizer** — real FFT via `parec`/`pw-record` + `spectrum.py` (same engine as Omaramp), rendered on a Canvas. Three modes only: Siri Wave, Sine Wave, Liquid Plasma. Click the visualizer or the mode label to cycle.
+- **Favorites** — star any station, favorites are pinned first and shown in a dedicated section above search. Persisted to `state.json`.
+- **Search** — filter stations by name, favorites remain pinned within results.
+- **Collapsible list** — collapsed by default, expands to a scrollable viewport showing 3.5 rows (remaining stations scroll). Current station highlighted with accent border.
+- **Volume + persistence** — slider controls mpv volume via IPC (`socat`), falls back to `--volume` on next play. Volume, last station and favorites are persisted to `~/.config/omarchy-ouifm/state.json`.
+- **Spotify** — one-click search for the current track on Spotify (no auth, opens `open.spotify.com/search/` in the browser).
+- **Sonos** — one-click send of the current stream to your Sonos speaker via SoCo (uses the `omasonos` venv if available, otherwise system `python3` + `soco`). No extra configuration if OmaSonos is already set up.
 
 ## Installation
 
@@ -35,31 +39,38 @@ omarchy plugin remove io.github.tug-benson.omarchy-ouifm
 ## Dependencies
 
 ```bash
-sudo pacman -S mpv socat curl
+sudo pacman -S mpv socat curl python3 python-numpy
+# optional for Sonos:
+# soco is provided by the OmaSonos venv at ~/.local/share/io.github.ctl0v0.omasonos/venv
+# optional for visualizer capture: pipewire-pulse or pulseaudio (parec), or pipewire (pw-record)
 ```
 
-- `mpv` — audio playback (no video, IPC for volume).
-- `socat` — send JSON IPC to mpv (`/tmp/omarchy-ouifm-mpv.sock`). Without it, volume still applies on the next play.
-- `curl` — ICY metadata polling for StreamTitle.
-- `python3` — optional, used to parse mpv `media-title` JSON.
+- `mpv` — audio playback (`--no-video --input-ipc-server`).
+- `socat` — JSON IPC to mpv for live volume changes.
+- `curl` + `python3` — track metadata via `ouifm.fr/api/TitleDiffusions` and `mpv` fallback.
+- `python-numpy` — optional, speeds up FFT in `spectrum.py` (pure Python fallback exists).
+- `parec` (pulseaudio/pipewire-pulse) or `pw-record` (pipewire) — audio capture for the visualizer.
+- `soco` — optional, only for Send to Sonos. Installed automatically with OmaSonos; otherwise `pip install soco`.
 
-All streams are public MP3 128k at `*.ice.infomaniak.ch`; cover art comes from `bocir-medias-prod.s3.fr-par.scw.cloud` (the vignettes used on ouifm.fr).
+All streams are public MP3 128k at `*.ice.infomaniak.ch`; cover art comes from `bocir-medias-prod` and `lesindesradios.fr` (TitleDiffusions).
 
 ## Usage
 
-1. Click the radio icon in the bar to open the panel (or run `omarchy-shell shell summon io.github.tug-benson.omarchy-ouifm '{}'`).
-2. The top card shows the current station cover and status. **Play/Stop** and the **volume slider** are there.
-3. Click *Afficher les stations (21)* to expand the list, then click a row to play it. Clicking the currently-playing row stops it.
-4. Close with `Esc` or the `` button.
-
-The `panel` kind can also be used as a standalone floating window without the bar widget.
+1. Click the radio icon in the bar to open the panel (or `omarchy-shell shell summon io.github.tug-benson.omarchy-ouifm '{}'`).
+2. The top card shows the current station cover (or live track cover) and track. Use Play/Stop, Spotify search and Sonos send.
+3. Adjust volume with the slider.
+4. Click the visualizer or its label to cycle Siri Wave / Sine Wave / Liquid Plasma.
+5. Favorites are shown above search; click the star on any station to pin it.
+6. Use search to filter stations, then expand the list to pick a station. Clicking the playing station stops it.
 
 ## How it works
 
-- `Service.qml` holds the station catalogue (`id`/`label`/`stream`/`image`/`altCover`), starts `mpv --input-ipc-server=/tmp/omarchy-ouifm-mpv.sock`, and exposes `play(id)`, `stop()`, `toggle()`, `setVolume(v)`. State is persisted to `~/.config/omarchy-ouifm/state.json`.
-- `BarWidget.qml` + `BarPanel.qml` — bar icon + `KeyboardPanel` popover anchored to the bar button.
-- `Panel.qml` — floating `PanelWindow` (same `OuifmContent.qml` inside) for `kind: "panel"`.
-- `OuifmContent.qml` — shared layout: title, now-playing card, volume, collapsible vertical list.
+- `Service.qml` — station catalogue (`id`/`idMds`/`label`/`stream`/`image`/`altCover`), `mpv` lifecycle (`/tmp/omarchy-ouifm-mpv.sock`), `TitleDiffusions` polling (15s) with `soco`/`mpv` fallback, spectrum daemon (`spectrum.py`), Sonos helper (`bin/omarchy-ouifm-sonos`), Spotify search. State persisted to `state.json`.
+- `BarWidget.qml` + `BarPanel.qml` — bar icon + `KeyboardPanel` popover.
+- `Panel.qml` — floating `PanelWindow` for `kind: panel`.
+- `OuifmContent.qml` — shared UI: title, now playing, volume, visualizer (Canvas + FileView on `.../omarchy-ouifm/spectrum.json`), favorites, search, collapsible list.
+- `spectrum.py` + `visualizers/` — FFT capture and three JS renderers (siriwave, sine, plasma) reused from Omaramp but scoped to `omarchy-ouifm`.
+- `bin/omarchy-ouifm-sonos` — Python helper that discovers Sonos via `soco.discover()` and calls `play_uri`.
 
 No secrets are stored. No privileged operations.
 
@@ -68,11 +79,19 @@ No secrets are stored. No privileged operations.
 ```
 omarchy-ouifm/
 ├── manifest.json
-├── Service.qml          # station catalogue, mpv lifecycle, state persistence
-├── BarWidget.qml        # bar icon + Loader -> BarPanel
-├── BarPanel.qml         # KeyboardPanel anchored to bar button
-├── Panel.qml            # floating PanelWindow (panel kind)
-├── OuifmContent.qml     # shared UI (title, now playing, volume, station list)
+├── Service.qml
+├── BarWidget.qml
+├── BarPanel.qml
+├── Panel.qml
+├── OuifmContent.qml
+├── spectrum.py
+├── visualizers/
+│   ├── helpers.js
+│   ├── siriwave.js
+│   ├── sine.js
+│   └── plasma.js
+├── bin/
+│   └── omarchy-ouifm-sonos
 ├── README.md
 ├── LICENSE
 └── preview.png
