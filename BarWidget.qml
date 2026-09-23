@@ -55,8 +55,8 @@ BarWidget {
         id: button
         anchors.fill: parent
         bar: root.bar
-        // Nerd Font: 󰓃 radio, 󰐊 play, 󰏤 stop — show live state
-        text: root.isPlaying ? "󰓃" : "󰓃"
+        // Glyph requested:  (radio) — Nerd Font
+        text: ""
         // Optional title next to icon when enabled
         tooltipText: root.isPlaying ? (root.currentLabel + " — Playing") : (root.currentLabel + " — Stopped")
         active: root.isPlaying

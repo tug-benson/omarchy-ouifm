@@ -15,27 +15,27 @@ Item {
     // id matches the LesIndesRadios vignette id, so cover URLs stay in sync
     // with https://www.ouifm.fr/
     property var stations: [
-        { "id": "QnaHBfM52n", "label": "OÜI FM",                    "stream": "https://ouifm.ice.infomaniak.ch/ouifm-high.mp3",                                 "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/QnaHBfM52n/vignette_sZiQFIhpey.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/QnaHBfM52n/altCover_8CpzR8mwYE.jpeg" },
-        { "id": "3qhtSltZ27", "label": "OÜI FM Classic Rock",        "stream": "https://ouifm3.ice.infomaniak.ch/ouifm3.mp3",                                      "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/3qhtSltZ27/vignette_nOidV7bBop.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/3qhtSltZ27/altCover_R7p05tD5Q2.jpeg" },
-        { "id": "fkYz8mdU3T", "label": "OÜI FM Rock Indé",           "stream": "https://ouifm5.ice.infomaniak.ch/ouifm5.mp3",                                      "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/fkYz8mdU3T/vignette_cjGXBqI93r.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/fkYz8mdU3T/altCover_5NQS8PHB9b.jpeg" },
-        { "id": "S2UWS5S3lJ", "label": "OÜI FM Alternatif",           "stream": "https://ouifm2.ice.infomaniak.ch/ouifm2.mp3",                                      "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/S2UWS5S3lJ/vignette_58RQVckYja.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/S2UWS5S3lJ/altCover_frjXUc4PzZ.jpeg" },
-        { "id": "RFWji6sMSN", "label": "OÜI FM Top of the Week",     "stream": "https://ouifmtopoftheweek.ice.infomaniak.ch/ouifmtopweek.mp3",                     "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/RFWji6sMSN/vignette_IaflxA6D6L.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/RFWji6sMSN/altCover_zlKlXPstmF.jpeg" },
-        { "id": "PVQ1nX8P2i", "label": "OÜI FM Garage Rock",         "stream": "https://ouifmgaragerock.ice.infomaniak.ch/ouifmgaragerock-128.mp3",                "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/PVQ1nX8P2i/vignette_nqZoLJ6NOr.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/PVQ1nX8P2i/altCover_ummeTyRg0j.jpeg" },
-        { "id": "0hw7uCfIT8", "label": "OÜI FM Girls Rock",          "stream": "https://ouifmgirlsrock.ice.infomaniak.ch/ouifmgirlsrock.mp3",                     "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/0hw7uCfIT8/vignette_P4zb130Otm.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/0hw7uCfIT8/altCover_bmfrstgZHj.jpeg" },
-        { "id": "3fkpVzB8Cc", "label": "OÜI FM Rock Français",       "stream": "https://ouifmrockfrancais.ice.infomaniak.ch/ouifmrockfrancais.mp3",               "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/3fkpVzB8Cc/vignette_lGYfIWyNKr.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/3fkpVzB8Cc/altCover_tpVSs09llO.jpeg" },
-        { "id": "OSdEHZc03t", "label": "OÜI FM Blues'n'Rock",        "stream": "https://ouifmbluesnrock.ice.infomaniak.ch/ouifmbluesnrock-128.mp3",                "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/OSdEHZc03t/vignette_tLUcW39Eaj.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/OSdEHZc03t/altCover_YoCChnbflz.jpeg" },
-        { "id": "tBdigJT2rb", "label": "OÜI FM Bring The Noise",     "stream": "https://ouifmbringthenoise.ice.infomaniak.ch/ouifmbringthenoise.mp3",             "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/tBdigJT2rb/vignette_HCC7xyXLiM.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/tBdigJT2rb/altCover_n2DWRpbDDN.jpeg" },
-        { "id": "RN2oOuAbDH", "label": "OÜI FM Summertime",          "stream": "https://ouifmsummertime.ice.infomaniak.ch/ouifmsummertime.mp3",                   "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/RN2oOuAbDH/vignette_cMoY3n8XxW.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/RN2oOuAbDH/altCover_FmBgTWAwSs.jpeg" },
-        { "id": "NSzUtv6XGF", "label": "OÜI FM Acoustic",            "stream": "https://ouifmacoustic.ice.infomaniak.ch/ouifmacoustic.mp3",                       "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/NSzUtv6XGF/vignette_Ju1TDijCWP.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/NSzUtv6XGF/altCover_5V2ADGPHxq.jpeg" },
-        { "id": "xD29y7pjPX", "label": "OÜI FM Génération Woodstock","stream": "https://ouifmwoodstock.ice.infomaniak.ch/ouifmwoodstock.mp3",                     "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/xD29y7pjPX/vignette_XVoA4HcmH0.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/xD29y7pjPX/altCover_lqZekA4HEC.jpeg" },
-        { "id": "QqHO8qpoE2", "label": "OÜI FM Les Slows du Rock",   "stream": "https://ouifmlesslowsdurock.ice.infomaniak.ch/ouifmslowrock.mp3",                 "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/QqHO8qpoE2/vignette_icvecoQ0B9.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/QqHO8qpoE2/altCover_PqU92eyE3T.jpeg" },
-        { "id": "ufIfkfDXSl", "label": "OÜI FM Reggae",              "stream": "https://ouifmganja.ice.infomaniak.ch/ouifmganja-128.mp3",                         "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/ufIfkfDXSl/vignette_EtXn3LZ0Op.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/ufIfkfDXSl/altCover_0wys1E1Qje.jpeg" },
-        { "id": "Jhdp1QoWCO", "label": "OÜI FM Rock 60's",           "stream": "https://ouifmrock60s.ice.infomaniak.ch/ouifmsixties.mp3",                         "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/Jhdp1QoWCO/vignette_OVC1nCnr2s.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/Jhdp1QoWCO/altCover_izO2zFY5Ig.jpeg" },
-        { "id": "GlXr8ww38P", "label": "OÜI FM Rock 70's",           "stream": "https://ouifmrock70s.ice.infomaniak.ch/ouifmseventies.mp3",                       "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/GlXr8ww38P/vignette_xLIKxsr5Mt.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/GlXr8ww38P/altCover_K9hZYTPdEn.jpeg" },
-        { "id": "6fo6l1uD2X", "label": "OÜI FM Rock 80's",           "stream": "https://ouifmrock80s.ice.infomaniak.ch/ouifmeighties.mp3",                        "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/6fo6l1uD2X/vignette_LUStwXEGji.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/6fo6l1uD2X/altCover_lT5uu98rHS.jpeg" },
-        { "id": "OQiFGri4ef", "label": "OÜI FM Rock 90's",           "stream": "https://ouifmrock90s.ice.infomaniak.ch/ouifmnineties.mp3",                        "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/OQiFGri4ef/vignette_81yJ3tp7Ud.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/OQiFGri4ef/altCover_vuCbgy4duu.jpeg" },
-        { "id": "PS5mho8vsS", "label": "OÜI FM Rock 2000",           "stream": "https://ouifmrock2000s.ice.infomaniak.ch/ouifmrock2000.mp3",                      "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/PS5mho8vsS/vignette_JPwFzzCtjY.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/PS5mho8vsS/altCover_v1jwed7RIJ.jpeg" },
-        { "id": "AQxuZekZgM", "label": "OÜI FM Rock'n'Food",         "stream": "https://ouifmrocknfood.ice.infomaniak.ch/ouifmrocknfood.mp3",                    "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/AQxuZekZgM/vignette_4EpdkDS9n1.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/AQxuZekZgM/altCover_EJDw3dsJa1.jpeg" }
+        { "id": "QnaHBfM52n", "idMds": "2174546520932614531", "label": "OÜI FM",                    "stream": "https://ouifm.ice.infomaniak.ch/ouifm-high.mp3",                                 "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/QnaHBfM52n/vignette_sZiQFIhpey.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/QnaHBfM52n/altCover_8CpzR8mwYE.jpeg" },
+        { "id": "3qhtSltZ27", "idMds": "3134161803443976427", "label": "OÜI FM Classic Rock",        "stream": "https://ouifm3.ice.infomaniak.ch/ouifm3.mp3",                                      "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/3qhtSltZ27/vignette_nOidV7bBop.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/3qhtSltZ27/altCover_R7p05tD5Q2.jpeg" },
+        { "id": "fkYz8mdU3T", "idMds": "3134161803443976526", "label": "OÜI FM Rock Indé",           "stream": "https://ouifm5.ice.infomaniak.ch/ouifm5.mp3",                                      "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/fkYz8mdU3T/vignette_cjGXBqI93r.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/fkYz8mdU3T/altCover_5NQS8PHB9b.jpeg" },
+        { "id": "S2UWS5S3lJ", "idMds": "3134161803443976382", "label": "OÜI FM Alternatif",           "stream": "https://ouifm2.ice.infomaniak.ch/ouifm2.mp3",                                      "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/S2UWS5S3lJ/vignette_58RQVckYja.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/S2UWS5S3lJ/altCover_frjXUc4PzZ.jpeg" },
+        { "id": "RFWji6sMSN", "idMds": "3754485939764896014", "label": "OÜI FM Top of the Week",     "stream": "https://ouifmtopoftheweek.ice.infomaniak.ch/ouifmtopweek.mp3",                     "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/RFWji6sMSN/vignette_IaflxA6D6L.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/RFWji6sMSN/altCover_zlKlXPstmF.jpeg" },
+        { "id": "PVQ1nX8P2i", "idMds": "1016696403088961793", "label": "OÜI FM Garage Rock",         "stream": "https://ouifmgaragerock.ice.infomaniak.ch/ouifmgaragerock-128.mp3",                "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/PVQ1nX8P2i/vignette_nqZoLJ6NOr.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/PVQ1nX8P2i/altCover_ummeTyRg0j.jpeg" },
+        { "id": "0hw7uCfIT8", "idMds": "3864441174941011218", "label": "OÜI FM Girls Rock",          "stream": "https://ouifmgirlsrock.ice.infomaniak.ch/ouifmgirlsrock.mp3",                     "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/0hw7uCfIT8/vignette_P4zb130Otm.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/0hw7uCfIT8/altCover_bmfrstgZHj.jpeg" },
+        { "id": "3fkpVzB8Cc", "idMds": "3820775684199026845", "label": "OÜI FM Rock Français",       "stream": "https://ouifmrockfrancais.ice.infomaniak.ch/ouifmrockfrancais.mp3",               "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/3fkpVzB8Cc/vignette_lGYfIWyNKr.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/3fkpVzB8Cc/altCover_tpVSs09llO.jpeg" },
+        { "id": "OSdEHZc03t", "idMds": "3134161803443976485", "label": "OÜI FM Blues'n'Rock",        "stream": "https://ouifmbluesnrock.ice.infomaniak.ch/ouifmbluesnrock-128.mp3",                "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/OSdEHZc03t/vignette_tLUcW39Eaj.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/OSdEHZc03t/altCover_YoCChnbflz.jpeg" },
+        { "id": "tBdigJT2rb", "idMds": "4004502594738215513", "label": "OÜI FM Bring The Noise",     "stream": "https://ouifmbringthenoise.ice.infomaniak.ch/ouifmbringthenoise.mp3",             "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/tBdigJT2rb/vignette_HCC7xyXLiM.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/tBdigJT2rb/altCover_n2DWRpbDDN.jpeg" },
+        { "id": "RN2oOuAbDH", "idMds": "3652031559378160590", "label": "OÜI FM Summertime",          "stream": "https://ouifmsummertime.ice.infomaniak.ch/ouifmsummertime.mp3",                   "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/RN2oOuAbDH/vignette_cMoY3n8XxW.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/RN2oOuAbDH/altCover_FmBgTWAwSs.jpeg" },
+        { "id": "NSzUtv6XGF", "idMds": "3906034555622012146", "label": "OÜI FM Acoustic",            "stream": "https://ouifmacoustic.ice.infomaniak.ch/ouifmacoustic.mp3",                       "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/NSzUtv6XGF/vignette_Ju1TDijCWP.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/NSzUtv6XGF/altCover_5V2ADGPHxq.jpeg" },
+        { "id": "xD29y7pjPX", "idMds": "3707948669989820452", "label": "OÜI FM Génération Woodstock","stream": "https://ouifmwoodstock.ice.infomaniak.ch/ouifmwoodstock.mp3",                     "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/xD29y7pjPX/vignette_XVoA4HcmH0.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/xD29y7pjPX/altCover_lqZekA4HEC.jpeg" },
+        { "id": "QqHO8qpoE2", "idMds": "3818508936105954443", "label": "OÜI FM Les Slows du Rock",   "stream": "https://ouifmlesslowsdurock.ice.infomaniak.ch/ouifmslowrock.mp3",                 "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/QqHO8qpoE2/vignette_icvecoQ0B9.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/QqHO8qpoE2/altCover_PqU92eyE3T.jpeg" },
+        { "id": "ufIfkfDXSl", "idMds": "3540892623380233022", "label": "OÜI FM Reggae",              "stream": "https://ouifmganja.ice.infomaniak.ch/ouifmganja-128.mp3",                         "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/ufIfkfDXSl/vignette_EtXn3LZ0Op.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/ufIfkfDXSl/altCover_0wys1E1Qje.jpeg" },
+        { "id": "Jhdp1QoWCO", "idMds": "3540892623380233039", "label": "OÜI FM Rock 60's",           "stream": "https://ouifmrock60s.ice.infomaniak.ch/ouifmsixties.mp3",                         "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/Jhdp1QoWCO/vignette_OVC1nCnr2s.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/Jhdp1QoWCO/altCover_izO2zFY5Ig.jpeg" },
+        { "id": "GlXr8ww38P", "idMds": "3540892623380233057", "label": "OÜI FM Rock 70's",           "stream": "https://ouifmrock70s.ice.infomaniak.ch/ouifmseventies.mp3",                       "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/GlXr8ww38P/vignette_xLIKxsr5Mt.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/GlXr8ww38P/altCover_K9hZYTPdEn.jpeg" },
+        { "id": "6fo6l1uD2X", "idMds": "3610476513821993259", "label": "OÜI FM Rock 80's",           "stream": "https://ouifmrock80s.ice.infomaniak.ch/ouifmeighties.mp3",                        "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/6fo6l1uD2X/vignette_LUStwXEGji.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/6fo6l1uD2X/altCover_lT5uu98rHS.jpeg" },
+        { "id": "OQiFGri4ef", "idMds": "3610476513821993340", "label": "OÜI FM Rock 90's",           "stream": "https://ouifmrock90s.ice.infomaniak.ch/ouifmnineties.mp3",                        "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/OQiFGri4ef/vignette_81yJ3tp7Ud.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/OQiFGri4ef/altCover_vuCbgy4duu.jpeg" },
+        { "id": "PS5mho8vsS", "idMds": "3652031559378160547", "label": "OÜI FM Rock 2000",           "stream": "https://ouifmrock2000s.ice.infomaniak.ch/ouifmrock2000.mp3",                      "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/PS5mho8vsS/vignette_JPwFzzCtjY.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/PS5mho8vsS/altCover_v1jwed7RIJ.jpeg" },
+        { "id": "AQxuZekZgM", "idMds": "3796007387461058949", "label": "OÜI FM Rock'n'Food",         "stream": "https://ouifmrocknfood.ice.infomaniak.ch/ouifmrocknfood.mp3",                    "image": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/AQxuZekZgM/vignette_4EpdkDS9n1.jpeg", "altCover": "https://bocir-medias-prod.s3.fr-par.scw.cloud/radios/ouifm/radiostream/AQxuZekZgM/altCover_EJDw3dsJa1.jpeg" }
     ]
 
     // ── Playback state ──
@@ -48,8 +48,13 @@ Item {
     property bool isLoading: false
     property string lastError: ""
     property int volume: 80
-    property string nowPlaying: ""   // ICY StreamTitle
+    property string nowPlaying: ""   // "Artist — Title" from TitleDiffusions
     property string nowPlayingRaw: ""
+    property string trackArtist: ""
+    property string trackTitle: ""
+    property string trackCover: ""
+    property string trackTimestamp: ""
+    property string currentMdsId: ""
     property var favorites: []   // array of station ids
 
     readonly property string ipcSocket: "/tmp/omarchy-ouifm-mpv.sock"
@@ -96,6 +101,7 @@ Item {
             currentLabel = st.label
             currentImage = st.image
             currentAltCover = st.altCover
+            currentMdsId = st.idMds || ""
         }
         // Try to restore persisted state (volume / last station)
         restoreProc.running = true
@@ -121,6 +127,7 @@ Item {
                         root.currentLabel = s.label
                         root.currentImage = s.image
                         root.currentAltCover = s.altCover
+                        root.currentMdsId = s.idMds || ""
                     }
                 }
                 if (o.favorites && Array.isArray(o.favorites)) {
@@ -168,12 +175,15 @@ Item {
         if (mpvProc.running) {
             mpvProc.running = false
         }
-        // Clean stray mpv instances bound to our socket
         killStaleProc.running = true
         root.isPlaying = false
         root.isLoading = false
         root.nowPlaying = ""
         root.nowPlayingRaw = ""
+        root.trackArtist = ""
+        root.trackTitle = ""
+        root.trackCover = ""
+        root.trackTimestamp = ""
     }
 
     Process {
@@ -200,9 +210,14 @@ Item {
         root.currentLabel = st.label
         root.currentImage = st.image
         root.currentAltCover = st.altCover
+        root.currentMdsId = st.idMds || ""
         root.lastError = ""
         root.isLoading = true
         root.nowPlaying = ""
+        root.trackArtist = ""
+        root.trackTitle = ""
+        root.trackCover = ""
+        root.trackTimestamp = ""
 
         // Ensure no stale socket, then launch
         launchAfterKill.stationStream = st.stream
@@ -256,40 +271,53 @@ Item {
         stdout: StdioCollector { waitForEnd: true }
     }
 
-    // ── ICY metadata polling (StreamTitle) ──
-    property string _metaUrl: ""
+    // ── Track metadata via ouifm.fr TitleDiffusions (primary) + mpv fallback
     Timer {
         id: metaTimer
-        interval: 7000
+        interval: 15000
         repeat: true
         running: root.isPlaying
+        triggeredOnStart: true
         onTriggered: {
-            if (!root.currentStream) return
-            // Query Icecast status via Icy-MetaData header trick: use curl with header
-            // Infomaniak exposes icy metadata inline; mpv also prints it but we poll via curl
-            metaProc.command = ["bash", "-lc", "curl -s -m 4 -H \"Icy-MetaData:1\" -H \"User-Agent: omarchy-ouifm/1.0\" \"" + root.currentStream + "\" -o /dev/null -D - 2>/dev/null | tr -d '\\r' | grep -i '^icy-' || curl -s -m 4 \"" + root.currentStream.replace("https://", "https://") + "\" -I 2>/dev/null | tr -d '\\r' | grep -i '^icy-' ; true"]
-            metaProc.running = true
+            if (!root.currentMdsId) return
+            var ts = Date.now()
+            titleProc.command = ["bash", "-lc", "curl -s -m 6 \"https://www.ouifm.fr/api/TitleDiffusions?size=1&radioStreamId=" + root.currentMdsId + "&date=" + ts + "\" -H \"Referer: https://www.ouifm.fr/\" -H \"User-Agent: Mozilla/5.0\" 2>/dev/null | python3 -c \"import sys,json; s=sys.stdin.read().strip(); d=json.loads(s) if s else []; t=d[0].get('title',{}) if d and len(d)>0 else {}; print((t.get('artist') or '') + '|' + (t.get('title') or '') + '|' + (t.get('coverUrl') or ''))\" 2>/dev/null; true"]
+            titleProc.running = true
         }
-        onRunningChanged: if (!running) { root.nowPlaying = ""; }
+        onRunningChanged: {
+            if (!running) {
+                root.nowPlaying = ""
+                root.trackArtist = ""
+                root.trackTitle = ""
+                root.trackCover = ""
+                root.trackTimestamp = ""
+            }
+        }
     }
 
     Process {
-        id: metaProc
+        id: titleProc
         stdout: StdioCollector { waitForEnd: true }
         onExited: function(code) {
-            var txt = stdout.text || ""
-            // Try to extract StreamTitle from icy headers or fallback to parsing
-            // Infomaniak sends icy-name/br but not always StreamTitle; we try alternative endpoint
-            if (txt.indexOf("StreamTitle") !== -1) {
-                var m = txt.match(/StreamTitle='([^']*)'/)
-                if (m && m[1]) {
-                    root.nowPlayingRaw = m[1]
-                    root.nowPlaying = m[1].trim()
+            var txt = (stdout.text || "").trim()
+            if (txt && txt.indexOf("|") !== -1) {
+                var parts = txt.split("|")
+                var artist = (parts[0] || "").trim()
+                var title = (parts[1] || "").trim()
+                var cover = (parts[2] || "").trim()
+                if (artist !== "" || title !== "") {
+                    root.trackArtist = artist
+                    root.trackTitle = title
+                    root.trackCover = cover
+                    root.trackTimestamp = new Date().toISOString()
+                    var combined = artist && title ? artist + " — " + title : (artist || title)
+                    root.nowPlaying = combined
+                    root.nowPlayingRaw = combined
                     return
                 }
             }
-            // Fallback: try to fetch via mpv IPC property (media-title)
-            titleIpcProc.command = ["bash", "-lc", "printf '{\"command\":[\"get_property\",\"media-title\"]}\\n' | socat - UNIX-CONNECT:/tmp/omarchy-ouifm-mpv.sock 2>/dev/null | python3 -c \"import sys,json; d=json.load(sys.stdin) if sys.stdin.read().strip() else {}; print(d.get('data',''))\" 2>/dev/null; true"]
+            // Fallback to mpv media-title if API empty
+            titleIpcProc.command = ["bash", "-lc", "printf '{\"command\":[\"get_property\",\"media-title\"]}\\n' | /usr/bin/socat - UNIX-CONNECT:/tmp/omarchy-ouifm-mpv.sock 2>/dev/null | python3 -c \"import sys,json; s=sys.stdin.read().strip(); d=json.loads(s) if s else {}; print(d.get('data',''))\" 2>/dev/null; true"]
             titleIpcProc.running = true
         }
     }
@@ -299,12 +327,11 @@ Item {
         stdout: StdioCollector { waitForEnd: true }
         onExited: function(code) {
             var t = (stdout.text || "").trim()
-            if (t && t !== "" && t !== "null") {
-                // Filter out raw URL as title
-                if (t.indexOf("http") !== 0) {
-                    root.nowPlaying = t
-                    root.nowPlayingRaw = t
-                }
+            if (t && t !== "" && t !== "null" && t.indexOf("http") !== 0) {
+                root.nowPlaying = t
+                root.nowPlayingRaw = t
+                root.trackTitle = t
+                root.trackArtist = ""
             }
         }
     }

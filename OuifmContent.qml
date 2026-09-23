@@ -101,7 +101,7 @@ ColumnLayout {
                 id: cover
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
-                source: service ? (service.currentImage || "") : ""
+                source: service ? ((service.trackCover && service.isPlaying ? service.trackCover : service.currentImage) || "") : ""
                 asynchronous: true
                 cache: true
                 smooth: true
@@ -124,8 +124,13 @@ ColumnLayout {
             Label {
                 textFormat: Text.PlainText
                 Layout.fillWidth: true
-                visible: service && service.nowPlaying !== ""
-                text: service ? service.nowPlaying : ""
+                visible: service && (service.trackArtist !== "" || service.trackTitle !== "" || service.nowPlaying !== "")
+                text: {
+                    if (!service) return ""
+                    if (service.trackArtist && service.trackTitle) return service.trackArtist + " — " + service.trackTitle
+                    if (service.trackTitle) return service.trackTitle
+                    return service.nowPlaying
+                }
                 font.family: fontFam
                 font.pixelSize: Style.font.body
                 color: fg
@@ -137,7 +142,7 @@ ColumnLayout {
             Label {
                 textFormat: Text.PlainText
                 Layout.fillWidth: true
-                visible: !service || service.nowPlaying === ""
+                visible: !service || (service.trackArtist === "" && service.trackTitle === "" && service.nowPlaying === "")
                 text: service && service.isPlaying ? "En direct — Rock'n'roll" : (service && service.lastError ? service.lastError : "Sélectionne une station")
                 font.family: fontFam
                 font.pixelSize: Style.font.bodySmall
