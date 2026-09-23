@@ -11,6 +11,7 @@ ColumnLayout {
     property var service: null
     property bool collapsed: true
     property string searchText: ""
+    property var visBands: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
     readonly property string fontFam: Style.font.family
     readonly property color fg: Color.foreground
@@ -161,15 +162,6 @@ ColumnLayout {
                         else service.play(service.currentId)
                     }
                 }
-                Button {
-                    visible: service && service.isPlaying
-                    iconText: "󰝚"
-                    fontFamily: "JetBrainsMono Nerd Font"
-                    fontSize: Style.font.body
-                    tooltipText: "Stop"
-                    Layout.preferredWidth: Style.space(28)
-                    onClicked: if (service) service.stop()
-                }
                 // Spotify search (sans auth) — glyph 
                 Button {
                     visible: service && (service.trackTitle !== "" || service.nowPlaying !== "")
@@ -212,6 +204,79 @@ ColumnLayout {
             color: cMuted
             Layout.preferredWidth: Style.space(36)
             horizontalAlignment: Text.AlignRight
+        }
+    }
+
+    // ── Visualizer (type omaramp bars, juste sous la barre de volume) ──
+    Rectangle {
+        id: visBox
+        visible: service && service.isPlaying
+        Layout.fillWidth: true
+        implicitHeight: Style.space(52)
+        radius: Style.space(4)
+        color: "#06070a"
+        border.color: service && service.isPlaying ? Qt.rgba(cAccent.r, cAccent.g, cAccent.b, 0.45) : Qt.rgba(1,1,1,0.12)
+        border.width: 1
+        clip: true
+
+        Canvas {
+            id: visCanvas
+            anchors.fill: parent
+            anchors.margins: 2
+            onPaint: {
+                var ctx = getContext("2d")
+                var w = width, h = height
+                ctx.clearRect(0, 0, w, h)
+                var bands = root.visBands
+                var count = bands.length
+                var gap = 3
+                var barW = Math.max(2, Math.floor((w - (count - 1) * gap) / count))
+                var totalW = count * barW + (count - 1) * gap
+                var startX = Math.floor((w - totalW) / 2)
+                var accent = cAccent
+                for (var i = 0; i < count; i++) {
+                    var v = Math.max(0.06, Math.min(1.0, bands[i] || 0))
+                    var barH = Math.max(3, v * h * 0.92)
+                    var x = startX + i * (barW + gap)
+                    var y = (h - barH) / 2
+                    // gradient accent → slightly darker
+                    var grad = ctx.createLinearGradient(x, y, x, y + barH)
+                    grad.addColorStop(0, Qt.rgba(accent.r, accent.g, accent.b, 0.95))
+                    grad.addColorStop(1, Qt.rgba(accent.r * 0.6, accent.g * 0.6, accent.b * 0.6, 0.85))
+                    ctx.fillStyle = grad
+                    ctx.fillRect(x, y, barW, barH)
+                }
+            }
+        }
+
+        Timer {
+            id: visTimer
+            interval: 75
+            running: root.service && root.service.isPlaying
+            repeat: true
+            onTriggered: {
+                var next = []
+                for (var i = 0; i < 24; i++) {
+                    var prev = root.visBands[i] || 0
+                    // target random 0.15–0.95, smooth toward target
+                    var target = 0.15 + Math.random() * 0.80
+                    // bass bump every ~8 frames
+                    if (i < 4 && Math.random() < 0.18) target = 0.85 + Math.random() * 0.15
+                    var v = prev * 0.55 + target * 0.45
+                    // peak decay if not playing soon stoppedhandled by visible
+                    next.push(Math.max(0.06, Math.min(1.0, v)))
+                }
+                root.visBands = next
+                visCanvas.requestPaint()
+            }
+            onRunningChanged: if (!running) { root.visBands = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]; visCanvas.requestPaint() }
+        }
+
+        // click to toggle play/pause as shortcut
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: if (service) service.toggle()
         }
     }
 
