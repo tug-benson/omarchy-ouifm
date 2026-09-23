@@ -409,14 +409,15 @@ ColumnLayout {
             opacity: 0.8
         }
 
-        // Scrollable viewport: 3.5 rows visible
+        // Scrollable viewport: 3.5 rows visible + petit extra pour ne pas tronquer la dernière ligne
         Flickable {
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(filteredStations.length * (Style.space(44) + Style.space(4)), Style.space(44) * 3.5 + Style.space(4) * 2.5)
+            Layout.preferredHeight: Math.min(filteredStations.length * (Style.space(44) + Style.space(4)), Style.space(44) * 3.5 + Style.space(16))
             clip: true
             contentWidth: width
             contentHeight: listCol.implicitHeight
             boundsBehavior: Flickable.StopAtBounds
+            bottomMargin: Style.space(4)
             ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
             ColumnLayout {
