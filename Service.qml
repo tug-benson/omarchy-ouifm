@@ -463,12 +463,12 @@ Item {
     IpcHandler {
         target: "io.github.tug-benson.omarchy-ouifm"
         function play(id: string): string { root.play(id); return "ok" }
-        function stop(): string { root.stop(); return "ok" }
-        function toggle(): string { root.toggle(); return "ok" }
+        function stop(dummy: string): string { root.stop(); return "ok" }
+        function toggle(dummy: string): string { root.toggle(); return "ok" }
         function setVolume(v: string): string { root.setVolume(parseInt(v, 10)); return "ok" }
         function toggleFavorite(id: string): string { root.toggleFavorite(id); return "ok" }
-        function searchSpotify(): string { root.searchSpotify(); return "ok" }
-        function sendToSonos(): string { root.sendToSonos(); return "ok" }
-        function ping(): string { return "ok" }
+        function searchSpotify(dummy: string): string { root.searchSpotify(); return "ok" }
+        function sendToSonos(dummy: string): string { root.sendToSonos(); return "ok" }
+        function ping(dummy: string): string { return "ok" }
     }
 }
