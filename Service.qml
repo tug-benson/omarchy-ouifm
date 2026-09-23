@@ -409,19 +409,25 @@ Item {
         var hintIp = ""
         try {
             var svc2 = sonosService
+            console.log("ouifm: Sonos svc", svc2 ? "found" : "null", "snapshot", svc2 && svc2.snapshot ? svc2.snapshot.status.state : "none")
             if (svc2 && svc2.snapshot) {
                 if (svc2.snapshot.target && svc2.snapshot.target.ip) hintIp = String(svc2.snapshot.target.ip)
                 else if (svc2.snapshot.households && svc2.snapshot.households.length > 0) {
                     var hh = svc2.snapshot.households[0]
                     if (hh.rooms && hh.rooms.length > 0) hintIp = String(hh.rooms[0].ip || "")
                 }
+                console.log("ouifm: Sonos hintIp", hintIp)
             }
-        } catch (e) {}
+        } catch (e) { console.warn("ouifm: Sonos hintIp error", e) }
         var script = Qt.resolvedUrl("bin/omarchy-ouifm-sonos").toString().replace(/^file:\/\//, "")
-        var args = [script, currentStream, title]
-        if (hintIp) args.push(hintIp)
-        console.log("ouifm: Sonos fallback direct play_uri", currentStream, "hintIp", hintIp)
-        sonosProc.command = args
+        // Use bash wrapper so helper re-exec works reliably from QML Process
+        var escUri = currentStream.replace(/'/g, "'\\''")
+        var escTitle = title.replace(/'/g, "'\\''")
+        var escHint = hintIp.replace(/'/g, "'\\''")
+        var cmd = "'" + script.replace(/'/g, "'\\''") + "' '" + escUri + "' '" + escTitle + "'"
+        if (hintIp) cmd += " '" + escHint + "'"
+        console.log("ouifm: Sonos fallback exec", cmd)
+        sonosProc.command = ["bash", "-lc", cmd + " 2>&1; echo EXIT:$?"]
         sonosProc.running = true
     }
     Process {
