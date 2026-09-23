@@ -57,6 +57,7 @@ Item {
     property string currentMdsId: ""
     property var favorites: []   // array of station ids
     readonly property var sonosService: shell && shell.serviceFor ? shell.serviceFor("io.github.ctl0v0.omasonos") : null
+    property bool hasSoco: false
 
     readonly property string ipcSocket: "/tmp/omarchy-ouifm-mpv.sock"
     readonly property var currentStation: {
@@ -104,8 +105,15 @@ Item {
             currentAltCover = st.altCover
             currentMdsId = st.idMds || ""
         }
-        // Try to restore persisted state (volume / last station)
         restoreProc.running = true
+        hasSocoProc.running = true
+    }
+
+    Process {
+        id: hasSocoProc
+        command: ["bash", "-lc", "python3 -c 'import soco' 2>/dev/null && echo 1 || (~/.local/share/io.github.ctl0v0.omasonos/venv/bin/python -c 'import soco' 2>/dev/null && echo 1) || echo 0"]
+        stdout: StdioCollector { waitForEnd: true }
+        onExited: function(code) { hasSoco = (stdout.text.trim() === "1") }
     }
 
     // ── Persisted state (volume + last station) ──

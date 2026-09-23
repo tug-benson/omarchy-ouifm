@@ -229,9 +229,9 @@ ColumnLayout {
                     Layout.preferredWidth: Style.space(28)
                     onClicked: if (service) service.searchSpotify()
                 }
-                // Send to Sonos — uses soco via omasonos venv if available
+                // Send to Sonos — hidden if neither OmaSonos nor soco available
                 Button {
-                    visible: service && service.currentStream !== ""
+                    visible: service && (service.sonosService !== null || service.hasSoco) && service.currentStream !== ""
                     iconText: "󰋊"
                     fontFamily: "JetBrainsMono Nerd Font"
                     fontSize: Style.font.body

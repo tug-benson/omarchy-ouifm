@@ -15,7 +15,7 @@ An [Omarchy](https://omarchy.org) plugin to listen to **OUI FM** and its 20 webr
 - **Collapsible list** — collapsed by default, expands to a scrollable viewport showing 3.5 rows (remaining stations scroll). Current station highlighted with accent border.
 - **Volume + persistence** — slider controls mpv volume via IPC (`socat`), falls back to `--volume` on next play. Volume, last station and favorites are persisted to `~/.config/omarchy-ouifm/state.json`.
 - **Spotify** — one-click search for the current track on Spotify (no auth, opens `open.spotify.com/search/` in the browser).
-- **Sonos** — one-click send to Sonos. If `omasonos` is installed and the station exists as a Sonos favorite (TuneIn), it plays that favorite via `OmaSonos` (`playFavorite`). Otherwise it falls back to direct `play_uri` via `soco` discovery (no extra config if OmaSonos is set up).
+- **Sonos** — one-click send to Sonos (visible only if `omasonos` is installed or `soco` is available; hidden otherwise to avoid a dead button). If the station exists as a Sonos favorite (TuneIn) it plays that favorite via `OmaSonos` (`playFavorite`), otherwise it falls back to direct `play_uri` via `soco` discovery.
 
 ## Installation
 
@@ -50,7 +50,7 @@ sudo pacman -S mpv socat curl python3 python-numpy
 - `curl` + `python3` — track metadata via `ouifm.fr/api/TitleDiffusions` and `mpv` fallback.
 - `python-numpy` — optional, speeds up FFT in `spectrum.py` (pure Python fallback exists).
 - `parec` (pulseaudio/pipewire-pulse) or `pw-record` (pipewire) — audio capture for the visualizer.
-- `soco` — optional, only for Send to Sonos. Installed automatically with OmaSonos; otherwise `pip install soco`.
+- `soco` — optional, only for Send to Sonos fallback. Installed automatically with OmaSonos; otherwise `pip install soco` (button is hidden if neither OmaSonos nor `soco` is found).
 
 All streams are public MP3 128k at `*.ice.infomaniak.ch`; cover art comes from `bocir-medias-prod` and `lesindesradios.fr` (TitleDiffusions).
 
@@ -96,6 +96,13 @@ omarchy-ouifm/
 ├── LICENSE
 └── preview.png
 ```
+
+## Credits
+
+- Visualizer engine and `spectrum.py` FFT capture adapted from [Omaramp](https://github.com/JoeJoeflyn/omaramp) (MIT) — three renderers kept: Siri Wave, Sine Wave, Liquid Plasma.
+- Sonos integration reuses discovery and `venv` from [OmaSonos](https://github.com/ctl0v0/omasonos) (`io.github.ctl0v0.omasonos`) for TuneIn favorites and `soco` handling. Direct `play_uri` fallback also via `soco`.
+
+Many thanks to both projects for the inspiration and reusable components.
 
 ## License
 
