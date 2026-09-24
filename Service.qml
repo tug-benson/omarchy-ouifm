@@ -282,6 +282,7 @@ Item {
     }
 
     // ── Track metadata via ouifm.fr TitleDiffusions (primary) + mpv fallback
+    // Bounded: 6s timeout + 8 KiB cap + Python 8 KiB read + 100 char truncation per field
     Timer {
         id: metaTimer
         interval: 15000
@@ -291,7 +292,7 @@ Item {
         onTriggered: {
             if (!root.currentMdsId) return
             var ts = Date.now()
-            titleProc.command = ["bash", "-lc", "curl -s -m 6 \"https://www.ouifm.fr/api/TitleDiffusions?size=1&radioStreamId=" + root.currentMdsId + "&date=" + ts + "\" -H \"Referer: https://www.ouifm.fr/\" -H \"User-Agent: Mozilla/5.0\" 2>/dev/null | python3 -c \"import sys,json; s=sys.stdin.read().strip(); d=json.loads(s) if s else []; t=d[0].get('title',{}) if d and len(d)>0 else {}; print((t.get('artist') or '') + '|' + (t.get('title') or '') + '|' + (t.get('coverUrl') or ''))\" 2>/dev/null; true"]
+            titleProc.command = ["bash", "-lc", "curl -s -m 6 \"https://www.ouifm.fr/api/TitleDiffusions?size=1&radioStreamId=" + root.currentMdsId + "&date=" + ts + "\" -H \"Referer: https://www.ouifm.fr/\" -H \"User-Agent: Mozilla/5.0\" 2>/dev/null | head -c 8192 | python3 -c \"import sys,json; s=sys.stdin.read(8192).strip(); d=json.loads(s) if s else []; t=d[0].get('title',{}) if d and len(d)>0 else {}; print(((t.get('artist') or '')[:100] + '|' + (t.get('title') or '')[:100] + '|' + (t.get('coverUrl') or '')[:512]))\" 2>/dev/null; true"]
             titleProc.running = true
         }
         onRunningChanged: {
@@ -308,26 +309,28 @@ Item {
     Process {
         id: titleProc
         stdout: StdioCollector { waitForEnd: true }
+        // Bounded stdout: StdioCollector default is 1 MiB, but we also cap via head/python
         onExited: function(code) {
-            var txt = (stdout.text || "").trim()
+            var txt = (stdout.text || "").trim().substring(0, 800)
             if (txt && txt.indexOf("|") !== -1) {
                 var parts = txt.split("|")
-                var artist = (parts[0] || "").trim()
-                var title = (parts[1] || "").trim()
-                var cover = (parts[2] || "").trim()
+                var artist = (parts[0] || "").trim().substring(0, 100)
+                var title = (parts[1] || "").trim().substring(0, 100)
+                var cover = (parts[2] || "").trim().substring(0, 512)
                 if (artist !== "" || title !== "") {
                     root.trackArtist = artist
                     root.trackTitle = title
                     root.trackCover = cover
                     root.trackTimestamp = new Date().toISOString()
                     var combined = artist && title ? artist + " — " + title : (artist || title)
+                    combined = combined.substring(0, 210)
                     root.nowPlaying = combined
                     root.nowPlayingRaw = combined
                     return
                 }
             }
             // Fallback to mpv media-title if API empty
-            titleIpcProc.command = ["bash", "-lc", "printf '{\"command\":[\"get_property\",\"media-title\"]}\\n' | /usr/bin/socat - UNIX-CONNECT:/tmp/omarchy-ouifm-mpv.sock 2>/dev/null | python3 -c \"import sys,json; s=sys.stdin.read().strip(); d=json.loads(s) if s else {}; print(d.get('data',''))\" 2>/dev/null; true"]
+            titleIpcProc.command = ["bash", "-lc", "printf '{\"command\":[\"get_property\",\"media-title\"]}\\n' | /usr/bin/socat - UNIX-CONNECT:/tmp/omarchy-ouifm-mpv.sock 2>/dev/null | head -c 4096 | python3 -c \"import sys,json; s=sys.stdin.read(4096).strip(); d=json.loads(s) if s else {}; print(str(d.get('data',''))[:200])\" 2>/dev/null; true"]
             titleIpcProc.running = true
         }
     }
@@ -336,8 +339,9 @@ Item {
         id: titleIpcProc
         stdout: StdioCollector { waitForEnd: true }
         onExited: function(code) {
-            var t = (stdout.text || "").trim()
+            var t = (stdout.text || "").trim().substring(0, 200)
             if (t && t !== "" && t !== "null" && t.indexOf("http") !== 0) {
+                t = t.substring(0, 200)
                 root.nowPlaying = t
                 root.nowPlayingRaw = t
                 root.trackTitle = t
