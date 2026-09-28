@@ -1,0 +1,184 @@
+#!/usr/bin/env python3
+"""Symlink-safe state persistence for omarchy-ouifm.
+
+Usage:
+  omarchy-ouifm-state load            -> prints JSON state or {} to stdout
+  omarchy-ouifm-state save '<json>'   -> validates and atomically writes state.json
+
+Security: never follows symlinks. If the destination is a symlink it is
+unlinked (link only, target untouched) before writing a fresh regular file.
+If the parent dir is a symlink or a non-regular file exists at the path,
+the write is aborted. Temp file + os.replace keeps the write atomic.
+"""
+import json
+import os
+import stat
+import sys
+import tempfile
+
+STATE_DIR = os.path.join(os.path.expanduser("~"), ".config", "omarchy-ouifm")
+STATE_FILE = os.path.join(STATE_DIR, "state.json")
+MAX_READ = 8192
+MAX_WRITE = 4096
+
+
+def _is_symlink(path):
+    try:
+        return os.path.islink(path)
+    except OSError:
+        return False
+
+
+def ensure_parent():
+    try:
+        os.makedirs(STATE_DIR, mode=0o700, exist_ok=True)
+    except OSError as e:
+        print(f"state: cannot create dir: {e}", file=sys.stderr)
+        return False
+    # Refuse to write through a symlinked parent
+    try:
+        if _is_symlink(STATE_DIR):
+            print("state: parent dir is a symlink, refusing to write", file=sys.stderr)
+            return False
+        st = os.stat(STATE_DIR)
+        if not stat.S_ISDIR(st.st_mode):
+            print("state: parent is not a directory, refusing", file=sys.stderr)
+            return False
+    except OSError as e:
+        print(f"state: parent check failed: {e}", file=sys.stderr)
+        return False
+    return True
+
+
+def cmd_load():
+    try:
+        if _is_symlink(STATE_FILE):
+            print("state: ignoring symlinked state file", file=sys.stderr)
+            print("{}")
+            return 0
+        fd = os.open(STATE_FILE, os.O_RDONLY | os.O_NOFOLLOW)
+    except FileNotFoundError:
+        print("{}")
+        return 0
+    except OSError as e:
+        print(f"state: cannot open (possible symlink): {e}", file=sys.stderr)
+        print("{}")
+        return 0
+    try:
+        with os.fdopen(fd, "r", encoding="utf-8") as f:
+            data = f.read(MAX_READ + 1)
+    except OSError as e:
+        print(f"state: read failed: {e}", file=sys.stderr)
+        print("{}")
+        return 0
+    if len(data) > MAX_READ:
+        print("state: file too large, ignoring", file=sys.stderr)
+        print("{}")
+        return 0
+    try:
+        o = json.loads(data.strip() or "{}")
+        if not isinstance(o, dict):
+            raise ValueError("not an object")
+    except (ValueError, json.JSONDecodeError) as e:
+        print(f"state: invalid JSON, ignoring: {e}", file=sys.stderr)
+        print("{}")
+        return 0
+    print(json.dumps(o))
+    return 0
+
+
+def validate(payload):
+    if not isinstance(payload, dict):
+        raise ValueError("payload must be an object")
+    out = {}
+    if "volume" in payload:
+        v = int(payload["volume"])
+        out["volume"] = max(0, min(100, v))
+    if "currentId" in payload:
+        cid = str(payload["currentId"])[:32]
+        if not all(c.isalnum() for c in cid):
+            raise ValueError("bad currentId")
+        out["currentId"] = cid
+    if "favorites" in payload:
+        favs = payload["favorites"]
+        if not isinstance(favs, list) or len(favs) > 64:
+            raise ValueError("bad favorites")
+        clean = []
+        for f in favs:
+            s = str(f)[:32]
+            if s and all(c.isalnum() for c in s):
+                clean.append(s)
+        out["favorites"] = clean
+    blob = json.dumps(out)
+    if len(blob) > MAX_WRITE:
+        raise ValueError("payload too large")
+    return blob
+
+
+def cmd_save(raw):
+    try:
+        payload = json.loads(raw)
+    except (ValueError, json.JSONDecodeError) as e:
+        print(f"state: invalid payload JSON: {e}", file=sys.stderr)
+        return 1
+    try:
+        blob = validate(payload)
+    except ValueError as e:
+        print(f"state: invalid payload: {e}", file=sys.stderr)
+        return 1
+    if not ensure_parent():
+        return 1
+    # If destination is a symlink, unlink the link itself (target untouched)
+    try:
+        if _is_symlink(STATE_FILE):
+            print("state: removing symlinked state file", file=sys.stderr)
+            os.unlink(STATE_FILE)
+        elif os.path.lexists(STATE_FILE):
+            st = os.lstat(STATE_FILE)
+            if not stat.S_ISREG(st.st_mode):
+                print("state: destination is not a regular file, refusing", file=sys.stderr)
+                return 1
+    except OSError as e:
+        print(f"state: destination check failed: {e}", file=sys.stderr)
+        return 1
+    # Atomic write via temp file in same dir, mode 0600
+    try:
+        fd, tmp = tempfile.mkstemp(dir=STATE_DIR, prefix=".state.", suffix=".tmp")
+        try:
+            os.fchmod(fd, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                f.write(blob)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp, STATE_FILE)
+            os.chmod(STATE_FILE, 0o600)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
+    except OSError as e:
+        print(f"state: write failed: {e}", file=sys.stderr)
+        return 1
+    print("ok")
+    return 0
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("usage: omarchy-ouifm-state load|save '<json>'", file=sys.stderr)
+        return 1
+    if sys.argv[1] == "load":
+        return cmd_load()
+    if sys.argv[1] == "save":
+        if len(sys.argv) < 3:
+            print("usage: omarchy-ouifm-state save '<json>'", file=sys.stderr)
+            return 1
+        return cmd_save(sys.argv[2])
+    print(f"unknown command: {sys.argv[1]}", file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

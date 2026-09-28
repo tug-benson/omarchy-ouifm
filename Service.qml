@@ -116,10 +116,13 @@ Item {
         onExited: function(code) { hasSoco = (stdout.text.trim() === "1") }
     }
 
-    // ── Persisted state (volume + last station) ──
+    // ── Persisted state (volume + last station + favorites) ──
+    // Symlink-safe: reads/writes go through bin/omarchy-ouifm-state, which
+    // uses O_NOFOLLOW and atomic temp+rename instead of shell redirection.
+    readonly property string stateScript: Qt.resolvedUrl("bin/omarchy-ouifm-state").toString().replace(/^file:\/\//, "")
     Process {
         id: restoreProc
-        command: ["bash", "-lc", "cat \"$HOME/.config/omarchy-ouifm/state.json\" 2>/dev/null || echo '{}'"]
+        command: [root.stateScript, "load"]
         stdout: StdioCollector { waitForEnd: true }
         onExited: function(code) {
             try {
@@ -155,10 +158,9 @@ Item {
         stdout: StdioCollector { waitForEnd: true }
     }
     function persistState() {
+        // Bounded payload (validated again in the helper); argv, no shell, no redirection
         var payload = JSON.stringify({ volume: root.volume, currentId: root.currentId, favorites: root.favorites })
-        // Escape single quotes for bash
-        var esc = payload.replace(/'/g, "'\\''")
-        saveProc.command = ["bash", "-lc", "mkdir -p \"$HOME/.config/omarchy-ouifm\" && printf '%s' '" + esc + "' > \"$HOME/.config/omarchy-ouifm/state.json\""]
+        saveProc.command = [root.stateScript, "save", payload.substring(0, 4096)]
         saveProc.running = true
     }
     onVolumeChanged: persistState()
